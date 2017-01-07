@@ -1,0 +1,11 @@
+Uuid: f99325340a404c67a8de2ce593824e0e
+ExtensionType: 1
+Name: ParrotNG
+ScreenVersion: 0.2
+SerialVersion: 1
+MinPlatformVersion: 0
+ProOnly: True
+Author: Mauro Gentile, Luca Carettoni
+ShortDescription: Adds a custom Scanner check to identify Flex applications vulnerable to CVE-2011-2461 (APSB11-25).
+EntryPoint: build/libs/parrot-ng-all.jar
+BuildCommand: gradle -PburpJar=$BURP_JAR fatJar
