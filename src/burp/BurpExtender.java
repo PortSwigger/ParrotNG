@@ -43,7 +43,7 @@ public class BurpExtender implements IBurpExtender, IScannerCheck {
     public List<IScanIssue> doPassiveScan(IHttpRequestResponse ihrr) {
 
         // Look for .SWF files
-        if (ihrr.getUrl().getPath().toLowerCase().endsWith(".swf")) {
+        if (helpers.analyzeRequest(ihrr).getUrl().getPath().toLowerCase().endsWith(".swf")) {
 
             // Download the file in Burp's temporary directory
             byte[] swfFile = getBody(ihrr.getResponse());
@@ -62,15 +62,16 @@ public class BurpExtender implements IBurpExtender, IScannerCheck {
             }
 
             // Scan using ParrotNG
-            callbacks.issueAlert("Analyzing '" + ihrr.getUrl() + "'");
-            System.out.println("[*] Analyzing '" + ihrr.getUrl() + "'");
+	    URL url = helpers.analyzeRequest(ihrr).getUrl();
+            callbacks.issueAlert("Analyzing '" + url + "'");
+            System.out.println("[*] Analyzing '" + url + "'");
             if (tmpFile != null) { 
                 String logDump = swfDump(tmpFile.toFile());
                 if (isVulnerable(logDump)) {
 
                     // If vulnerable, report the vulnerability
                     List<IScanIssue> issues = new ArrayList<>(1);
-                    issues.add(new CVE20112461Issue(ihrr));
+                    issues.add(new CVE20112461Issue(url, ihrr));
                     return issues;
                 }
             }
@@ -126,30 +127,17 @@ public class BurpExtender implements IBurpExtender, IScannerCheck {
 
 class CVE20112461Issue implements IScanIssue {
 
+    private URL url;
     private IHttpRequestResponse reqres;
 
-    public CVE20112461Issue(IHttpRequestResponse reqres) {
+    public CVE20112461Issue(URL url, IHttpRequestResponse reqres) {
+        this.url = url;
         this.reqres = reqres;
     }
 
     @Override
-    public String getHost() {
-        return reqres.getHost();
-    }
-
-    @Override
-    public int getPort() {
-        return reqres.getPort();
-    }
-
-    @Override
-    public String getProtocol() {
-        return reqres.getProtocol();
-    }
-
-    @Override
     public URL getUrl() {
-        return reqres.getUrl();
+        return url;
     }
 
     @Override
@@ -196,7 +184,7 @@ class CVE20112461Issue implements IScanIssue {
     @Override
     public String getIssueDetail() {
         return "Burp Scanner (ParrotNG extension) has identified the following vulnerable SWF file: <b>"
-                + (reqres.getUrl().getPath().substring(reqres.getUrl().getPath().lastIndexOf("/")+1, reqres.getUrl().getPath().lastIndexOf(".")+4)).replace("<","&lt;").replace(">","&gt;") + "</b><br><br>"
+                + (url.getPath().substring(url.getPath().lastIndexOf("/")+1, url.getPath().lastIndexOf(".")+4)).replace("<","&lt;").replace(">","&gt;") + "</b><br><br>"
                 + "This Flex application is vulnerable to CVE-2011-2461. Hosting vulnerable "
                 + "SWF files leads to an \"indirect\" SOP bypass in fully patched web browsers and plugins. "
                 + "An attacker can inject a malicious localization resource using Flex's resourceModuleURLs FlashVar. "
