@@ -8,4 +8,4 @@ ProOnly: True
 Author: Mauro Gentile, Luca Carettoni
 ShortDescription: Adds a custom Scanner check to identify Flex applications vulnerable to CVE-2011-2461 (APSB11-25).
 EntryPoint: build/libs/parrot-ng-all.jar
-BuildCommand: gradle -PburpJar=$BURP_JAR fatJar
+BuildCommand: gradle fatJar
