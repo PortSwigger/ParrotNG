@@ -1,6 +1,7 @@
 Uuid: f99325340a404c67a8de2ce593824e0e
 ExtensionType: 1
 Name: ParrotNG
+RepoName: parrot-ng
 ScreenVersion: 0.2
 SerialVersion: 1
 MinPlatformVersion: 0
